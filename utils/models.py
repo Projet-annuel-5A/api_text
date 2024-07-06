@@ -19,6 +19,10 @@ class Models:
         return cls._instance
 
     def __init__(self) -> None:
+        """
+        Initializes models (tte_model_id) and tokenizer (tte_tokenizer) based on configuration (textConfig.ini).
+        Sets device ("cuda:0" if GPU available, else "cpu").
+        """
         if not self.__initialized:
             self.config = self.__get_config()
             self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -29,6 +33,14 @@ class Models:
             self.__initialized = True
 
     def __get_config(self) -> configparser.ConfigParser:
+        """
+        Reads and returns the configuration from 'textConfig.ini', which contains
+        necessary settings like model identifiers.
+        Returns:
+            configparser.ConfigParser: The loaded configuration settings.
+        Raises:
+            IOError: If the 'textConfig.ini' file is not present, the method raises an IOError and exits the program.
+        """
         config = configparser.ConfigParser()
         if len(config.sections()) == 0:
             try:
@@ -42,6 +54,13 @@ class Models:
         return config
 
     def __init_models(self, tte_model_id) -> Tuple:
+        """
+        Initializes and returns the tokenizer and model for text emotion analysis based on the specified model ID.
+        Parameters:
+            tte_model_id (str): Model identifier for loading tokenizer and model.
+        Functionality:
+            Initializes tokenizer and model for emotion analysis.
+        """
         # Text to emotions
         tte_tokenizer = AutoTokenizer.from_pretrained(tte_model_id)
         tte_model = AutoModelForSequenceClassification.from_pretrained(tte_model_id)
