@@ -180,39 +180,6 @@ class Utils:
             sys.exit(1)
         return connection
 
-    def save_to_s3(self, filename: str, content: bytes, file_format: str, s3_subfolder: str = None) -> bool:
-        """
-        Parameters: filename (str): Name of the file to save.
-                    content (bytes): File content to upload.
-                    file_format (str): Format of the file (audio, video, text).
-                    s3_subfolder (str, optional): Subfolder in S3 bucket to save the file.
-        Functionality:
-            Saves content to an S3 bucket specified in configuration.
-            Logs successful or failed file upload.
-        """
-        match file_format:
-            case 'audio':
-                content_type = 'audio/mpeg'
-            case 'video':
-                content_type = 'video/mp4'
-            case 'text':
-                content_type = 'text/plain'
-            case _:
-                content_type = 'text/plain'
-
-        try:
-            s3_path = '{}/{}/{}'.format(self.output_s3_folder,
-                                        s3_subfolder,
-                                        filename) if s3_subfolder else '{}/{}'.format(self.output_s3_folder, filename)
-            self.supabase_connection.upload(file=content, path=s3_path, file_options={'content-type': content_type})
-            self.log.info('File {} uploaded to S3 bucket at {}'.format(filename, s3_path))
-            return True
-        except Exception as e:
-            message = ('Error uploading the file {} to the S3 bucket.'.
-                       format(filename), str(e))
-            self.log.error(message)
-            return False
-
     def end_log(self) -> None:
         """
         Functionality:
@@ -225,7 +192,16 @@ class Utils:
             if isinstance(handler, BufferingHandler):
                 log = handler.flush()
                 if log:
-                    self.save_to_s3('{}.log'.format(handler.filename), log.encode(), 'text', 'logs')
+                    s3_path = 'logs/{}'.format(handler.filename)
+                    try:
+                        self.supabase_connection.upload(file=log.encode(),
+                                                        path=s3_path,
+                                                        file_options={'content-type': 'text/plain'}
+                                                        )
+                        self.log.info('Log file {} uploaded to S3 bucket'.format(handler.filename))
+                    except Exception as e:
+                        self.log.error('Error uploading the file {} to the S3 bucket : {}.'.
+                                       format(handler.filename, str(e)))
             logging.getLogger('textLog').removeHandler(handler)
 
     def get_texts_from_db(self) -> pd.DataFrame:
