@@ -32,5 +32,5 @@ COPY . .
 # ENTRYPOINT ["python3"]
 
 # Commands to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8002"]
 EXPOSE 8002
