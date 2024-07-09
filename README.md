@@ -46,13 +46,6 @@ Raises:
     HTTPException: Exception with a status code 500 indicating a server error if the process fails.
 """
 ```
-```fastAPI
-@app.post("/testConfig")
-"""
-Endpoint for testing the device where the models where loaded.
-Response: JSON object showing the model ID and the device (CPU or GPU) it is loaded on.
-"""
-```
 
 ### TextEmotions (textEmotions.py):
 Manages the text analysis process by fetching text data, applying emotional analysis, and updating results.
