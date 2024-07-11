@@ -49,7 +49,9 @@ class TextEmotions:
         # Sort the dictionary by values in descending order
         sorted_values = {k: v for k, v in sorted(values_dict.items(), key=lambda x: x[1], reverse=True)}
 
-        return sorted_values
+        adjusted_values = self.utils.adjust_values(sorted_values)
+
+        return adjusted_values
 
     def process(self, all_texts: pd.Series) -> pd.Series:
         """
